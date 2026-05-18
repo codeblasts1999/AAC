@@ -1,0 +1,162 @@
+body { 
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+    padding: 15px; 
+    background: #f4f6f9; 
+    margin: 0;
+}
+
+#app {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+#output-field { 
+    width: 100%;
+    height: 120px; 
+    border: 2px solid #007AFF; 
+    padding: 12px; 
+    font-size: 1.6rem; 
+    border-radius: 12px; 
+    background: white; 
+    margin-bottom: 15px; 
+    box-sizing: border-box;
+    resize: none;
+    font-family: inherit;
+}
+
+/* Keyboard Container Layout */
+#keyboard { 
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    background: #e5e5ea;
+    padding: 8px;
+    border-radius: 14px;
+}
+
+.keyboard-row {
+    display: flex;
+    width: 100%;
+    gap: 4px;
+    justify-content: center;
+}
+
+/* Enhanced Touch Targets for AAC Accessibility */
+.key { 
+    flex: 1;
+    min-width: 0; 
+    padding: 16px 0;
+    touch-action: manipulation; 
+    background: white; 
+    border: none;
+    border-radius: 6px; 
+    font-size: 1.2rem; 
+    font-weight: 500;
+    cursor: pointer;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+    display: inline-block;
+    text-align: center;
+    color: #000;
+}
+
+.key:active {
+    background: #d1d1d6;
+}
+
+/* Utility Functional Classes overrides */
+.key.shift-key {
+    background: #adb5bd;
+    color: white;
+    flex: 1.5;
+}
+
+.key.shift-key.active {
+    background: #007AFF;
+}
+
+.key.backspace-key { 
+    background: #ff3b30; 
+    color: white; 
+    font-weight: bold;
+    flex: 1.5; 
+}
+
+.key.space-key {
+    flex: 5;
+    background: #ffffff;
+}
+
+/* Macro Control grid configuration */
+.controls { 
+    display: grid; 
+    grid-template-columns: repeat(3, 1fr); 
+    gap: 10px; 
+    margin-bottom: 15px; 
+}
+
+button { 
+    padding: 14px; 
+    cursor: pointer; 
+    border-radius: 10px; 
+    border: none; 
+    font-weight: bold; 
+    font-size: 1rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+#speak-btn { background: #34c759; color: white; }
+#ai-btn { background: #5856d6; color: white; }
+#clear-btn { background: #8e8e93; color: white; }
+
+#emergency-btn { 
+    grid-column: span 3; 
+    font-size: 1.2rem;
+    padding: 16px;
+}
+
+/* Modal Layout Rules */
+.modal {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex; justify-content: center; align-items: center;
+    z-index: 1000;
+}
+
+.modal.hidden { display: none; }
+
+.modal-content {
+    background: white; padding: 20px;
+    width: 90%; max-width: 450px;
+    border-radius: 14px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+}
+
+#chat-history {
+    height: 250px; overflow-y: auto;
+    border: 1px solid #e5e5ea;
+    margin-bottom: 12px; padding: 10px;
+    font-size: 1rem; border-radius: 8px;
+}
+
+/* Stylings for Chat Message bubbles */
+.chat-message { 
+    margin-bottom: 10px; 
+    padding: 10px; 
+    border-radius: 10px; 
+    line-height: 1.4; 
+    word-wrap: break-word;
+}
+.you { background: #e1f5fe; text-align: right; margin-left: 40px; }
+.ai { background: #f2f2f7; text-align: left; margin-right: 40px; }
+
+#ai-input {
+    width: 100%; padding: 12px; margin-bottom: 12px;
+    box-sizing: border-box; border: 1px solid #ccc; border-radius: 8px;
+    font-size: 1rem;
+}
+
+.modal-buttons { display: flex; justify-content: space-between; gap: 10px; }
+.modal-buttons button { flex: 1; }
+#close-ai-btn { background: #e5e5ea; color: black; }
+#send-ai-btn { background: #007AFF; color: white; }
