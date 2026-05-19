@@ -1,162 +1,190 @@
-body { 
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
-    padding: 15px; 
-    background: #f4f6f9; 
-    margin: 0;
-}
+document.addEventListener('DOMContentLoaded', () => {
+    const output = document.getElementById('output-field');
+    const keyboard = document.getElementById('keyboard');
+    
+    // Shift toggle tracking state
+    let isShiftActive = false;
 
-#app {
-    max-width: 800px;
-    margin: 0 auto;
-}
+    // Standard structural definitions for every row of keys
+    const keyboardLayout = [
+        // Row 1: Numbers & Standard Symbols
+        [['1', '!'], ['2', '@'], ['3', '#'], ['4', '$'], ['5', '%'], ['6', '^'], ['7', '&'], ['8', '*'], ['9', '('], ['0', ')'], ['-', '_'], ['=', '+']],
+        // Row 2: Top Letters & Brackets
+        [['q', 'Q'], ['w', 'W'], ['e', 'E'], ['r', 'R'], ['t', 'T'], ['y', 'Y'], ['u', 'U'], ['i', 'I'], ['o', 'O'], ['p', 'P'], ['[', '{'], [']', '}']],
+        // Row 3: Middle Letters & Punctuation
+        [['a', 'A'], ['s', 'S'], ['d', 'D'], ['f', 'F'], ['g', 'G'], ['h', 'H'], ['j', 'J'], ['k', 'K'], ['l', 'L'], [';', ':'], ["'", '"'], ['\\', '|']],
+        // Row 4: Bottom Letters & Punctuation
+        [['z', 'Z'], ['x', 'X'], ['c', 'C'], ['v', 'V'], ['b', 'B'], ['n', 'N'], ['m', 'M'], [',', '<'], ['.', '>'], ['/', '?']],
+        // Row 5: Action Modifiers & Layout controls
+        [['Shift', 'Shift', 'shift-key'], [' ', ' ', 'space-key'], ['⌫', '⌫', 'backspace-key']]
+    ];
 
-#output-field { 
-    width: 100%;
-    height: 120px; 
-    border: 2px solid #007AFF; 
-    padding: 12px; 
-    font-size: 1.6rem; 
-    border-radius: 12px; 
-    background: white; 
-    margin-bottom: 15px; 
-    box-sizing: border-box;
-    resize: none;
-    font-family: inherit;
-}
+    // Main Keyboard Render Function
+    function renderKeyboard() {
+        keyboard.innerHTML = ''; 
 
-/* Keyboard Container Layout */
-#keyboard { 
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    background: #e5e5ea;
-    padding: 8px;
-    border-radius: 14px;
-}
+        keyboardLayout.forEach(row => {
+            const rowContainer = document.createElement('div');
+            rowContainer.className = 'keyboard-row';
 
-.keyboard-row {
-    display: flex;
-    width: 100%;
-    gap: 4px;
-    justify-content: center;
-}
+            row.forEach(keyConfig => {
+                const [normalChar, shiftedChar, customClass] = keyConfig;
+                const button = document.createElement('button');
+                button.className = 'key';
+                
+                // Set appropriate display text based on active Shift state
+                if (customClass) {
+                    button.classList.add(customClass);
+                    button.textContent = normalChar;
+                    if (customClass === 'shift-key' && isShiftActive) {
+                        button.classList.add('active');
+                    }
+                } else {
+                    button.textContent = isShiftActive ? shiftedChar : normalChar;
+                }
 
-/* Enhanced Touch Targets for AAC Accessibility */
-.key { 
-    flex: 1;
-    min-width: 0; 
-    padding: 16px 0;
-    touch-action: manipulation; 
-    background: white; 
-    border: none;
-    border-radius: 6px; 
-    font-size: 1.2rem; 
-    font-weight: 500;
-    cursor: pointer;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
-    display: inline-block;
-    text-align: center;
-    color: #000;
-}
+                // Prevent losing focus on textarea wrapper element when keys are tapped
+                button.onmousedown = (e) => e.preventDefault();
 
-.key:active {
-    background: #d1d1d6;
-}
+                button.onclick = () => {
+                    const startPos = output.selectionStart;
+                    const endPos = output.selectionEnd;
+                    const currentText = output.value;
 
-/* Utility Functional Classes overrides */
-.key.shift-key {
-    background: #adb5bd;
-    color: white;
-    flex: 1.5;
-}
+                    if (customClass === 'shift-key') {
+                        isShiftActive = !isShiftActive;
+                        renderKeyboard(); 
+                        return;
+                    } 
+                    
+                    if (customClass === 'backspace-key') {
+                        if (startPos === endPos) {
+                            if (startPos > 0) {
+                                output.value = currentText.substring(0, startPos - 1) + currentText.substring(endPos);
+                                output.setSelectionRange(startPos - 1, startPos - 1);
+                            }
+                        } else {
+                            output.value = currentText.substring(0, startPos) + currentText.substring(endPos);
+                            output.setSelectionRange(startPos, startPos);
+                        }
+                    } else {
+                        const charToInsert = isShiftActive ? shiftedChar : normalChar;
+                        output.value = currentText.substring(0, startPos) + charToInsert + currentText.substring(endPos);
+                        output.setSelectionRange(startPos + 1, startPos + 1);
 
-.key.shift-key.active {
-    background: #007AFF;
-}
+                        if (isShiftActive) {
+                            isShiftActive = false;
+                            renderKeyboard();
+                        }
+                    }
+                    output.focus();
+                };
 
-.key.backspace-key { 
-    background: #ff3b30; 
-    color: white; 
-    font-weight: bold;
-    flex: 1.5; 
-}
+                rowContainer.appendChild(button);
+            });
 
-.key.space-key {
-    flex: 5;
-    background: #ffffff;
-}
+            keyboard.appendChild(rowContainer);
+        });
+    }
 
-/* Macro Control grid configuration */
-.controls { 
-    display: grid; 
-    grid-template-columns: repeat(3, 1fr); 
-    gap: 10px; 
-    margin-bottom: 15px; 
-}
+    // --- Speech Synthesizer Flow Controllers ---
+    const speakText = (msg) => {
+        if (!msg.trim()) return;
+        const utterance = new SpeechSynthesisUtterance(msg);
+        window.speechSynthesis.speak(utterance);
+    };
 
-button { 
-    padding: 14px; 
-    cursor: pointer; 
-    border-radius: 10px; 
-    border: none; 
-    font-weight: bold; 
-    font-size: 1rem;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-}
+    const setOutputAndSpeak = (msg) => {
+        output.value = msg;
+        speakText(msg);
+        output.focus();
+    };
 
-#speak-btn { background: #34c759; color: white; }
-#ai-btn { background: #5856d6; color: white; }
-#clear-btn { background: #8e8e93; color: white; }
+    // Controller Bindings
+    document.getElementById('emergency-btn').onclick = () => setOutputAndSpeak("Emergency! I need help immediately.");
+    document.getElementById('hello-btn').onclick = () => setOutputAndSpeak("Hello.");
+    document.getElementById('morn-btn').onclick = () => setOutputAndSpeak("Good morning.");
+    document.getElementById('help-btn').onclick = () => setOutputAndSpeak("I need help.");
+    document.getElementById('where-btn').onclick = () => setOutputAndSpeak("Where is it?");
+    document.getElementById('finish-btn').onclick = () => setOutputAndSpeak("I'm finished with my task.");
+    
+    document.getElementById('speak-btn').onclick = () => speakText(output.value);
+    document.getElementById('clear-btn').onclick = () => { output.value = ''; output.focus(); };
 
-#emergency-btn { 
-    grid-column: span 3; 
-    font-size: 1.2rem;
-    padding: 16px;
-}
+    // --- Pure Client-Side AI Chat Logic ---
+    const aiBtn = document.getElementById('ai-btn');
+    const aiModal = document.getElementById('ai-modal');
+    const closeAiBtn = document.getElementById('close-ai-btn');
+    const sendAiBtn = document.getElementById('send-ai-btn');
+    const aiInput = document.getElementById('ai-input');
+    const chatHistory = document.getElementById('chat-history');
 
-/* Modal Layout Rules */
-.modal {
-    position: fixed;
-    top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0, 0, 0, 0.6);
-    display: flex; justify-content: center; align-items: center;
-    z-index: 1000;
-}
+    // Replace YOUR_GROQ_API_KEY with your actual Groq key for local testing
+    const GROQ_API_KEY = "YOUR_GROQ_API_KEY"; 
 
-.modal.hidden { display: none; }
+    aiBtn.onclick = () => {
+        const currentAacText = output.value.trim();
+        if (currentAacText) {
+            aiInput.value = currentAacText;
+        }
+        aiModal.classList.remove('hidden');
+        aiInput.focus();
+    };
 
-.modal-content {
-    background: white; padding: 20px;
-    width: 90%; max-width: 450px;
-    border-radius: 14px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-}
+    closeAiBtn.onclick = () => aiModal.classList.add('hidden');
 
-#chat-history {
-    height: 250px; overflow-y: auto;
-    border: 1px solid #e5e5ea;
-    margin-bottom: 12px; padding: 10px;
-    font-size: 1rem; border-radius: 8px;
-}
+    const handleAiSend = async () => {
+        const question = aiInput.value.trim();
+        if (!question) return;
 
-/* Stylings for Chat Message bubbles */
-.chat-message { 
-    margin-bottom: 10px; 
-    padding: 10px; 
-    border-radius: 10px; 
-    line-height: 1.4; 
-    word-wrap: break-word;
-}
-.you { background: #e1f5fe; text-align: right; margin-left: 40px; }
-.ai { background: #f2f2f7; text-align: left; margin-right: 40px; }
+        chatHistory.innerHTML += `<div class="chat-message you"><strong>You:</strong> ${question}</div>`;
+        aiInput.value = '';
 
-#ai-input {
-    width: 100%; padding: 12px; margin-bottom: 12px;
-    box-sizing: border-box; border: 1px solid #ccc; border-radius: 8px;
-    font-size: 1rem;
-}
+        const loadingId = 'loading-' + Date.now();
+        chatHistory.innerHTML += `<div id="${loadingId}" class="chat-message ai"><em>Thinking about the best decision...</em></div>`;
+        chatHistory.scrollTop = chatHistory.scrollHeight;
 
-.modal-buttons { display: flex; justify-content: space-between; gap: 10px; }
-.modal-buttons button { flex: 1; }
-#close-ai-btn { background: #e5e5ea; color: black; }
-#send-ai-btn { background: #007AFF; color: white; }
+        try {
+            // Direct API fetch call replacing the Flask backend route connection
+            const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${GROQ_API_KEY}`
+                },
+                body: JSON.stringify({
+                    model: "llama-3.3-70b-versatile",
+                    messages: [
+                        {
+                            role: "system", 
+                            content: "You are a supportive, calm, and predictable assistant for autistic teenagers. Help them identify pros/cons, social impacts, and clear next steps for decisions. Keep your vocabulary direct, your sentences short, and use structured bullet points where helpful."
+                        },
+                        { role: "user", content: question }
+                    ]
+                })
+            });
+
+            const data = await response.json();
+            const loadingElement = document.getElementById(loadingId);
+            if (loadingElement) loadingElement.remove();
+
+            if (data.choices && data.choices[0].message) {
+                const reply = data.choices[0].message.content;
+                chatHistory.innerHTML += `<div class="chat-message ai"><strong>AI:</strong> ${reply}</div>`;
+            } else if (data.error) {
+                chatHistory.innerHTML += `<div class="chat-message ai" style="color:red;">Error: ${data.error.message}</div>`;
+            }
+        } catch (error) {
+            const loadingElement = document.getElementById(loadingId);
+            if (loadingElement) loadingElement.remove();
+            chatHistory.innerHTML += `<div class="chat-message ai" style="color:red;">Error: Connection failure.</div>`;
+        }
+        chatHistory.scrollTop = chatHistory.scrollHeight;
+    };
+
+    sendAiBtn.onclick = handleAiSend;
+    aiInput.onkeypress = (e) => { if (e.key === 'Enter') handleAiSend(); };
+
+    // Initialize Keyboard on mount
+    renderKeyboard();
+});
