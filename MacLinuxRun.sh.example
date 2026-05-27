@@ -1,0 +1,5 @@
+cd waterdog-app
+python3 -m venv venv
+venv/bin/pip install -r requirements.txt
+export GROQ_API_KEY="YourAPIKeyHere"
+venv/bin/python aac.py

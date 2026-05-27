@@ -146,21 +146,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             // Direct API fetch call replacing the Flask backend route connection
-            const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+            const response = await fetch('/api/chat', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${GROQ_API_KEY}`
+                    'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    model: "llama-3.3-70b-versatile",
-                    messages: [
-                        {
-                            role: "system", 
-                            content: "You are a supportive, calm, and predictable assistant for autistic teenagers. Help them identify pros/cons, social impacts, and clear next steps for decisions. Keep your vocabulary direct, your sentences short, and use structured bullet points where helpful."
-                        },
-                        { role: "user", content: question }
-                    ]
+                    message: question
                 })
             });
 
@@ -168,11 +160,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const loadingElement = document.getElementById(loadingId);
             if (loadingElement) loadingElement.remove();
 
-            if (data.choices && data.choices[0].message) {
-                const reply = data.choices[0].message.content;
+            if (data.reply) {
+                const reply = data.reply;
                 chatHistory.innerHTML += `<div class="chat-message ai"><strong>AI:</strong> ${reply}</div>`;
             } else if (data.error) {
-                chatHistory.innerHTML += `<div class="chat-message ai" style="color:red;">Error: ${data.error.message}</div>`;
+                chatHistory.innerHTML += `<div class="chat-message ai" style="color:red;">Error: ${data.error}</div>`;
             }
         } catch (error) {
             const loadingElement = document.getElementById(loadingId);
