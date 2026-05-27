@@ -1,0 +1,11 @@
+/venv
+/venv/
+/venv/*
+venv/
+venv/*
+__pycache__/
+*.pyc
+
+#KEEP THESE - prevents accidental upload of API keys when staging
+MacLinuxRun.sh
+WindowsRun.bat
