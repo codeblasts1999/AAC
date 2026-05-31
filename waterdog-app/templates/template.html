@@ -12,7 +12,10 @@
         <div id="ai-panel">
             <div class="panel-header">
                 <h3>AI Assistant</h3>
-                <button id="toggle-panel-btn" title="Move panel to right">→</button>
+                <div class="panel-header-actions">
+                    <button id="toggle-panel-btn" title="Move panel to right">→</button>
+                    <button id="hide-ai-btn">Hide</button>
+                </div>
             </div>
             <div class="who-are-you-section">
                 <textarea id="who-are-you" placeholder="Who are you?"></textarea>
@@ -30,8 +33,10 @@
             </div>
         </div>
 
-        <!-- Main content: output + controls + keyboard -->
+        <!-- Main content: output field + controls + keyboard -->
         <div id="main-content">
+            <button id="show-ai-btn">Show AI</button>
+            <textarea id="output-field"></textarea>
             <div class="controls">
                 <button id="speak-btn">📢 Speak</button>
                 <button id="ai-btn">🤖 AI Chat</button>
@@ -43,7 +48,6 @@
                 <button id="finish-btn">✅ Task finished</button>
                 <button id="emergency-btn" style="background: #d32f2f; color: white;">🚨 EMERGENCY</button>
             </div>
-
             <div id="keyboard"></div>
         </div>
     </div>

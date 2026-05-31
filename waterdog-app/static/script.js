@@ -1,10 +1,12 @@
 document.addEventListener('DOMContentLoaded', () => {
+    const output = document.getElementById('output-field');
     const aiInput = document.getElementById('ai-input');
     const whoAreYou = document.getElementById('who-are-you');
     const keyboard = document.getElementById('keyboard');
 
-    // Keyboard types into whichever input is currently active
-    let activeInput = aiInput;
+    // Keyboard types into whichever input is currently focused
+    let activeInput = output;
+    output.addEventListener('focus', () => { activeInput = output; });
     aiInput.addEventListener('focus', () => { activeInput = aiInput; });
     whoAreYou.addEventListener('focus', () => { activeInput = whoAreYou; });
 
@@ -109,28 +111,29 @@ document.addEventListener('DOMContentLoaded', () => {
         window.speechSynthesis.speak(utterance);
     };
 
-    const insertIntoAiInput = (text) => {
-        const startPos = aiInput.selectionStart;
-        const endPos = aiInput.selectionEnd;
-        const current = aiInput.value;
-        aiInput.value = current.substring(0, startPos) + text + current.substring(endPos);
-        aiInput.setSelectionRange(startPos + text.length, startPos + text.length);
-        aiInput.focus();
+    const setOutputAndSpeak = (text) => {
+        output.value = text;
         speakText(text);
+        output.focus();
     };
 
-    // Controller Bindings
-    document.getElementById('emergency-btn').onclick = () => insertIntoAiInput("Emergency! I need help immediately.");
-    document.getElementById('hello-btn').onclick = () => insertIntoAiInput("Hello.");
-    document.getElementById('morn-btn').onclick = () => insertIntoAiInput("Good morning.");
-    document.getElementById('help-btn').onclick = () => insertIntoAiInput("I need help.");
-    document.getElementById('where-btn').onclick = () => insertIntoAiInput("Where is it?");
-    document.getElementById('finish-btn').onclick = () => insertIntoAiInput("I'm finished with my task.");
+    // Macro buttons set the output field and speak aloud
+    document.getElementById('emergency-btn').onclick = () => setOutputAndSpeak("Emergency! I need help immediately.");
+    document.getElementById('hello-btn').onclick = () => setOutputAndSpeak("Hello.");
+    document.getElementById('morn-btn').onclick = () => setOutputAndSpeak("Good morning.");
+    document.getElementById('help-btn').onclick = () => setOutputAndSpeak("I need help.");
+    document.getElementById('where-btn').onclick = () => setOutputAndSpeak("Where is it?");
+    document.getElementById('finish-btn').onclick = () => setOutputAndSpeak("I'm finished with my task.");
 
-    document.getElementById('speak-btn').onclick = () => speakText(aiInput.value);
-    document.getElementById('clear-btn').onclick = () => { aiInput.value = ''; aiInput.focus(); };
+    document.getElementById('speak-btn').onclick = () => speakText(output.value);
+    document.getElementById('clear-btn').onclick = () => { output.value = ''; output.focus(); };
 
-    document.getElementById('ai-btn').onclick = () => aiInput.focus();
+    // AI Chat button — pre-fills AI input with current output text then focuses it
+    document.getElementById('ai-btn').onclick = () => {
+        const current = output.value.trim();
+        if (current) aiInput.value = current;
+        aiInput.focus();
+    };
 
     // Toggle AI panel between left and right
     const aiPanel = document.getElementById('ai-panel');
@@ -141,6 +144,17 @@ document.addEventListener('DOMContentLoaded', () => {
         const isRight = aiPanel.classList.contains('panel-right');
         togglePanelBtn.textContent = isRight ? '←' : '→';
         togglePanelBtn.title = isRight ? 'Move panel to left' : 'Move panel to right';
+    };
+
+    // Hide / Show AI panel
+    const showAiBtn = document.getElementById('show-ai-btn');
+    document.getElementById('hide-ai-btn').onclick = () => {
+        aiPanel.classList.add('panel-hidden');
+        showAiBtn.style.display = 'block';
+    };
+    showAiBtn.onclick = () => {
+        aiPanel.classList.remove('panel-hidden');
+        showAiBtn.style.display = 'none';
     };
 
     // --- AI Chat Logic ---
@@ -194,6 +208,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const actions = document.createElement('div');
         actions.className = 'ai-actions';
 
+        const speakAiBtn = document.createElement('button');
+        speakAiBtn.className = 'ai-action-btn speak-ai-btn';
+        speakAiBtn.textContent = '🔊';
+        speakAiBtn.title = 'Read aloud';
+        speakAiBtn.onclick = () => speakText(replyText);
+
         const rejectBtn = document.createElement('button');
         rejectBtn.className = 'ai-action-btn reject-btn';
         rejectBtn.textContent = 'Reject';
@@ -204,7 +224,7 @@ document.addEventListener('DOMContentLoaded', () => {
         retryBtn.textContent = 'Retry';
         retryBtn.onclick = () => fetchAiReply(question, false, div);
 
-        actions.append(rejectBtn, retryBtn);
+        actions.append(speakAiBtn, rejectBtn, retryBtn);
         div.appendChild(actions);
         return div;
     };
