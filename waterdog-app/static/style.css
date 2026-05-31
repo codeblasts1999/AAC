@@ -160,3 +160,12 @@ button {
 .modal-buttons button { flex: 1; }
 #close-ai-btn { background: #e5e5ea; color: black; }
 #send-ai-btn { background: #007AFF; color: white; }
+.ai-privacy-notice {
+    margin-top: 12px;
+    padding: 10px 14px;
+    background: #fff0f0;
+    border: 1px solid #c0392b;
+    border-radius: 10px;
+    color: #c0392b;
+    font-size: 0.85rem;
+}
