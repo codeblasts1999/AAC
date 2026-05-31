@@ -179,6 +179,12 @@ document.addEventListener('DOMContentLoaded', () => {
     sendAiBtn.onclick = handleAiSend;
     aiInput.onkeypress = (e) => { if (e.key === 'Enter') handleAiSend(); };
 
+    // Disclaimer modal — dismiss on acknowledge
+    const disclaimerModal = document.getElementById('disclaimer-modal');
+    document.getElementById('disclaimer-ok-btn').onclick = () => {
+        disclaimerModal.classList.add('hidden');
+    };
+
     // Initialize Keyboard on mount
     renderKeyboard();
 });
