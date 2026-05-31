@@ -1,35 +1,255 @@
-body { 
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
-    padding: 15px; 
-    background: #f4f6f9; 
+/* ── Theme Variables ────────────────────────────────────────────── */
+:root {
+    --bg-page:        #f4f6f9;
+    --bg-panel:       #ffffff;
+    --bg-input:       #ffffff;
+    --bg-keyboard:    #e5e5ea;
+    --bg-key:         #ffffff;
+    --bg-key-active:  #d1d1d6;
+    --bg-bubble-you:  #e1f5fe;
+    --bg-bubble-ai:   #f2f2f7;
+    --bg-modal:       #ffffff;
+    --bg-btn-default: #e9e9eb;
+    --bg-toggle-btn:  #f0f0f5;
+    --text-primary:   #000000;
+    --text-secondary: #333333;
+    --text-muted:     #666666;
+    --border-default: #cccccc;
+    --border-subtle:  #e5e5ea;
+    --panel-shadow:   rgba(0, 0, 0, 0.10);
+    --overlay-bg:     rgba(0, 0, 0, 0.60);
+    --privacy-bg:     #fff0f0;
+    --privacy-text:   #c0392b;
+}
+
+html.dark-mode {
+    --bg-page:        #0d0d0f;
+    --bg-panel:       #1c1c1e;
+    --bg-input:       #2c2c2e;
+    --bg-keyboard:    #1c1c1e;
+    --bg-key:         #3a3a3c;
+    --bg-key-active:  #545456;
+    --bg-bubble-you:  #1a3a4a;
+    --bg-bubble-ai:   #2c2c2e;
+    --bg-modal:       #1c1c1e;
+    --bg-btn-default: #3a3a3c;
+    --bg-toggle-btn:  #3a3a3c;
+    --text-primary:   #f5f5f7;
+    --text-secondary: #d1d1d6;
+    --text-muted:     #8e8e93;
+    --border-default: #48484a;
+    --border-subtle:  #3a3a3c;
+    --panel-shadow:   rgba(0, 0, 0, 0.40);
+    --overlay-bg:     rgba(0, 0, 0, 0.80);
+    --privacy-bg:     rgba(192, 57, 43, 0.15);
+    --privacy-text:   #ff8080;
+}
+
+/* ── Accessibility ──────────────────────────────────────────────── */
+.sr-only {
+    position: absolute;
+    width: 1px; height: 1px;
+    padding: 0; margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+:focus-visible {
+    outline: 3px solid #0062CC;
+    outline-offset: 2px;
+    border-radius: 3px;
+}
+
+/* ── Base ───────────────────────────────────────────────────────── */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    padding: 15px;
+    background: var(--bg-page);
+    color: var(--text-primary);
     margin: 0;
 }
 
+/* ── Page header (theme toggle) ─────────────────────────────────── */
+#page-header {
+    display: flex;
+    justify-content: flex-end;
+    max-width: 1200px;
+    margin: 0 auto 10px;
+}
+
+#theme-btn {
+    background: var(--bg-btn-default);
+    color: var(--text-secondary);
+    padding: 6px 14px;
+    font-size: 0.85rem;
+    font-weight: normal;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    box-shadow: none;
+}
+
+/* ── App layout ─────────────────────────────────────────────────── */
 #app {
-    max-width: 800px;
+    display: flex;
+    flex-direction: row;
+    gap: 15px;
+    align-items: flex-start;
+    max-width: 1200px;
     margin: 0 auto;
 }
 
-#output-field { 
+/* ── AI Panel ───────────────────────────────────────────────────── */
+#ai-panel {
+    width: 300px;
+    flex-shrink: 0;
+    background: var(--bg-panel);
+    border-radius: 14px;
+    padding: 16px;
+    box-shadow: 0 2px 12px var(--panel-shadow);
+    order: 0;
+}
+
+#ai-panel.panel-right  { order: 2; }
+#ai-panel.panel-hidden { display: none; }
+
+.panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.panel-header h2 {
+    margin: 0;
+    font-size: 1.1rem;
+    color: var(--text-primary);
+}
+
+.panel-header-actions { display: flex; gap: 6px; }
+
+#toggle-panel-btn {
+    background: var(--bg-toggle-btn);
+    color: var(--text-secondary);
+    padding: 6px 10px;
+    font-size: 1rem;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-weight: normal;
+    box-shadow: none;
+}
+
+#toggle-panel-btn:active { background: var(--bg-key-active); }
+
+#hide-ai-btn {
+    background: #c0392b;
+    color: white;
+    padding: 6px 10px;
+    font-size: 0.85rem;
+    border-radius: 8px;
+    font-weight: normal;
+    box-shadow: none;
+}
+
+.disable-ai-section {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border-subtle);
+}
+
+#disable-ai-btn {
+    background: #3a3a3c;
+    color: white;
     width: 100%;
-    height: 120px; 
-    border: 2px solid #007AFF; 
-    padding: 12px; 
-    font-size: 1.6rem; 
-    border-radius: 12px; 
-    background: white; 
-    margin-bottom: 15px; 
+    font-size: 0.85rem;
+    border-radius: 8px;
+    font-weight: normal;
+    box-shadow: none;
+}
+
+/* ── Main content ───────────────────────────────────────────────── */
+#main-content {
+    flex: 1;
+    min-width: 0;
+    order: 1;
+}
+
+#ai-reveal-btns {
+    display: none;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+#show-ai-btn {
+    background: #2e7d32;
+    color: white;
+    flex: 1;
+}
+
+#disable-ai-btn-main {
+    background: #3a3a3c;
+    color: white;
+    padding: 6px 10px;
+    font-size: 0.85rem;
+    border-radius: 8px;
+    font-weight: normal;
+    box-shadow: none;
+}
+
+#output-field {
+    width: 100%;
+    min-height: 100px;
+    border: 2px solid #007AFF;
+    padding: 12px;
+    font-size: 1.6rem;
+    border-radius: 12px;
+    background: var(--bg-input);
+    color: var(--text-primary);
+    margin-bottom: 15px;
     box-sizing: border-box;
-    resize: none;
+    resize: vertical;
     font-family: inherit;
 }
 
-/* Keyboard Container Layout */
-#keyboard { 
+/* ── Controls ───────────────────────────────────────────────────── */
+.controls {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+button {
+    padding: 14px;
+    cursor: pointer;
+    border-radius: 10px;
+    border: none;
+    font-weight: bold;
+    font-size: 1rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    background: var(--bg-btn-default);
+    color: var(--text-primary);
+}
+
+#speak-btn { background: #2e7d32; color: white; }
+#ai-btn    { background: #5856d6; color: white; }
+#clear-btn { background: #636366; color: white; }
+
+#emergency-btn {
+    grid-column: span 3;
+    font-size: 1.2rem;
+    padding: 16px;
+}
+
+/* ── Keyboard ───────────────────────────────────────────────────── */
+#keyboard {
     display: flex;
     flex-direction: column;
     gap: 6px;
-    background: #e5e5ea;
+    background: var(--bg-keyboard);
     padding: 8px;
     border-radius: 14px;
 }
@@ -41,122 +261,207 @@ body {
     justify-content: center;
 }
 
-/* Enhanced Touch Targets for AAC Accessibility */
-.key { 
+.key {
     flex: 1;
-    min-width: 0; 
+    min-width: 0;
     padding: 16px 0;
-    touch-action: manipulation; 
-    background: white; 
+    touch-action: manipulation;
+    background: var(--bg-key);
+    color: var(--text-primary);
     border: none;
-    border-radius: 6px; 
-    font-size: 1.2rem; 
+    border-radius: 6px;
+    font-size: 1.2rem;
     font-weight: 500;
     cursor: pointer;
     box-shadow: 0 1px 3px rgba(0,0,0,0.15);
     display: inline-block;
     text-align: center;
-    color: #000;
 }
 
-.key:active {
-    background: #d1d1d6;
-}
+.key:active { background: var(--bg-key-active); }
 
-/* Utility Functional Classes overrides */
-.key.shift-key {
-    background: #adb5bd;
-    color: white;
-    flex: 1.5;
-}
+.key.shift-key        { background: #6c757d; color: white; flex: 1.5; }
+.key.shift-key.active { background: #0062CC; }
+.key.backspace-key    { background: #c0392b; color: white; font-weight: bold; flex: 1.5; }
+.key.space-key        { flex: 5; background: var(--bg-key); }
 
-.key.shift-key.active {
-    background: #007AFF;
-}
-
-.key.backspace-key { 
-    background: #ff3b30; 
-    color: white; 
-    font-weight: bold;
-    flex: 1.5; 
-}
-
-.key.space-key {
-    flex: 5;
-    background: #ffffff;
-}
-
-/* Macro Control grid configuration */
-.controls { 
-    display: grid; 
-    grid-template-columns: repeat(3, 1fr); 
-    gap: 10px; 
-    margin-bottom: 15px; 
-}
-
-button { 
-    padding: 14px; 
-    cursor: pointer; 
-    border-radius: 10px; 
-    border: none; 
-    font-weight: bold; 
-    font-size: 1rem;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-}
-
-#speak-btn { background: #34c759; color: white; }
-#ai-btn { background: #5856d6; color: white; }
-#clear-btn { background: #8e8e93; color: white; }
-
-#emergency-btn { 
-    grid-column: span 3; 
-    font-size: 1.2rem;
-    padding: 16px;
-}
-
-/* Modal Layout Rules */
-.modal {
-    position: fixed;
-    top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0, 0, 0, 0.6);
-    display: flex; justify-content: center; align-items: center;
-    z-index: 1000;
-}
-
-.modal.hidden { display: none; }
-
-.modal-content {
-    background: white; padding: 20px;
-    width: 90%; max-width: 450px;
-    border-radius: 14px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-}
-
+/* ── Chat panel internals ───────────────────────────────────────── */
 #chat-history {
-    height: 250px; overflow-y: auto;
-    border: 1px solid #e5e5ea;
-    margin-bottom: 12px; padding: 10px;
-    font-size: 1rem; border-radius: 8px;
+    min-height: 150px;
+    max-height: 400px;
+    overflow-y: auto;
+    border: 1px solid var(--border-subtle);
+    margin-bottom: 12px;
+    padding: 10px;
+    font-size: 1rem;
+    border-radius: 8px;
+    background: var(--bg-input);
 }
 
-/* Stylings for Chat Message bubbles */
-.chat-message { 
-    margin-bottom: 10px; 
-    padding: 10px; 
-    border-radius: 10px; 
-    line-height: 1.4; 
+.chat-message {
+    margin-bottom: 10px;
+    padding: 10px;
+    border-radius: 10px;
+    line-height: 1.4;
     word-wrap: break-word;
+    color: var(--text-primary);
 }
-.you { background: #e1f5fe; text-align: right; margin-left: 40px; }
-.ai { background: #f2f2f7; text-align: left; margin-right: 40px; }
+
+.you { background: var(--bg-bubble-you); text-align: right;  margin-left: 20px; }
+.ai  { background: var(--bg-bubble-ai);  text-align: left;   margin-right: 20px; }
+
+.who-are-you-section { margin-bottom: 10px; }
+
+#who-are-you {
+    width: 100%;
+    min-height: 56px;
+    padding: 8px 10px;
+    box-sizing: border-box;
+    border: 1px solid var(--border-default);
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-family: inherit;
+    resize: none;
+    background: var(--bg-input);
+    color: var(--text-primary);
+}
+
+#who-are-you:focus {
+    border-color: #5856d6;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(88, 86, 214, 0.25);
+}
+
+#who-are-you::placeholder { color: var(--text-muted); }
+
+.groq-notice {
+    margin-top: 10px;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    line-height: 1.4;
+}
+
+.groq-notice a {
+    color: var(--text-muted);
+    text-decoration: underline;
+}
 
 #ai-input {
-    width: 100%; padding: 12px; margin-bottom: 12px;
-    box-sizing: border-box; border: 1px solid #ccc; border-radius: 8px;
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 12px;
+    box-sizing: border-box;
+    border: 1px solid var(--border-default);
+    border-radius: 8px;
     font-size: 1rem;
+    background: var(--bg-input);
+    color: var(--text-primary);
 }
+
+#ai-input::placeholder   { color: var(--text-muted); }
+#output-field::placeholder { color: var(--text-muted); }
 
 .modal-buttons { display: flex; justify-content: space-between; gap: 10px; }
 .modal-buttons button { flex: 1; }
-#close-ai-btn { background: #e5e5ea; color: black; }
-#send-ai-btn { background: #007AFF; color: white; }
+#send-ai-btn { background: #0062CC; color: white; }
+
+/* ── Chat action buttons ────────────────────────────────────────── */
+.ai-actions {
+    display: flex;
+    gap: 6px;
+    margin-top: 8px;
+    flex-wrap: wrap;
+}
+
+.ai-action-btn {
+    padding: 3px 10px;
+    font-size: 0.75rem;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    font-weight: normal;
+    box-shadow: none;
+}
+
+.reject-btn      { background: #c0392b; color: white; }
+.resend-btn      { background: var(--bg-btn-default); color: var(--text-secondary); }
+.retry-btn       { background: #0062CC; color: white; }
+.not-intent-btn  { background: #ff9500; color: #1a1a1a; }
+.corroborate-btn { background: #5856d6; color: white; }
+.elaborate-btn   { background: #2e7d32; color: white; }
+.speak-ai-btn    { background: #636366; color: white; }
+
+.clarification-panel { display: flex; gap: 6px; margin-top: 6px; }
+
+#ai-input.clarifying {
+    border-color: #ff9500;
+    box-shadow: 0 0 0 2px rgba(255, 149, 0, 0.25);
+}
+
+/* ── Confidence badge ───────────────────────────────────────────── */
+.ai-confidence {
+    display: inline-block;
+    margin-top: 6px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 0.78rem;
+}
+
+/* ── Privacy notice ─────────────────────────────────────────────── */
+.ai-privacy-notice {
+    margin-top: 12px;
+    padding: 10px 14px;
+    background: var(--privacy-bg);
+    border: 1px solid #c0392b;
+    border-radius: 10px;
+    color: var(--privacy-text);
+    font-size: 0.85rem;
+}
+
+/* ── Disclaimer modal ───────────────────────────────────────────── */
+.disclaimer-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: var(--overlay-bg);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+}
+
+.disclaimer-overlay.hidden { display: none; }
+
+.disclaimer-box {
+    background: var(--bg-modal);
+    border-radius: 14px;
+    padding: 28px 24px;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 10px 25px var(--panel-shadow);
+    text-align: center;
+}
+
+.disclaimer-box h2 {
+    margin: 0 0 14px;
+    font-size: 1.2rem;
+    color: var(--text-primary);
+}
+
+.disclaimer-box p {
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: var(--text-secondary);
+    margin: 0 0 12px;
+}
+
+.disclaimer-box a { color: #0062CC; }
+
+#disclaimer-ok-btn {
+    margin-top: 8px;
+    width: 100%;
+    background: #0062CC;
+    color: white;
+    font-size: 1rem;
+    padding: 14px;
+    border-radius: 10px;
+}
