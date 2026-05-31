@@ -161,8 +161,17 @@ document.addEventListener('DOMContentLoaded', () => {
             if (loadingElement) loadingElement.remove();
 
             if (data.reply) {
-                const reply = data.reply;
-                chatHistory.innerHTML += `<div class="chat-message ai"><strong>AI:</strong> ${reply}</div>`;
+                const lines = data.reply.trimEnd().split('\n');
+                const lastLine = lines[lines.length - 1].trim();
+                const confidenceMatch = lastLine.match(/^Confidence:\s*(\d+)%$/i);
+                let reply, confidenceHTML = '';
+                if (confidenceMatch) {
+                    reply = lines.slice(0, -1).join('\n').trimEnd();
+                    confidenceHTML = `<div class="ai-confidence">Confidence: ${confidenceMatch[1]}%</div>`;
+                } else {
+                    reply = data.reply;
+                }
+                chatHistory.innerHTML += `<div class="chat-message ai"><strong>AI:</strong> ${reply}${confidenceHTML}</div>`;
             } else if (data.error) {
                 chatHistory.innerHTML += `<div class="chat-message ai" style="color:red;">Error: ${data.error}</div>`;
             }
