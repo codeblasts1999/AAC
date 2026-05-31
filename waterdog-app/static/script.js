@@ -131,6 +131,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const sendAiBtn = document.getElementById('send-ai-btn');
     const chatHistory = document.getElementById('chat-history');
 
+    const confidenceStyle = (pct) => {
+        const hue = Math.round((pct / 100) * 120);
+        const sat = Math.round(70 + (1 - pct / 100) * 30);
+        const color = `hsl(${hue}, ${sat}%, 32%)`;
+        const bg = `hsl(${hue}, ${sat}%, 95%)`;
+        const border = `hsl(${hue}, ${sat}%, 55%)`;
+        const weight = pct < 40 ? 'bold' : 'normal';
+        const borderWidth = pct < 30 ? '2px' : '1px';
+        return `color:${color};background:${bg};border:${borderWidth} solid ${border};font-weight:${weight};`;
+    };
+
     const handleAiSend = async () => {
         const question = aiInput.value.trim();
         if (!question) return;
@@ -160,7 +171,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 let reply, confidenceHTML = '';
                 if (confidenceMatch) {
                     reply = lines.slice(0, -1).join('\n').trimEnd();
-                    confidenceHTML = `<div class="ai-confidence">Confidence: ${confidenceMatch[1]}%</div>`;
+                    const pct = Math.max(0, parseInt(confidenceMatch[1]) - 10);
+                    confidenceHTML = `<div class="ai-confidence" style="${confidenceStyle(pct)}">Confidence: ${pct}%</div>`;
                 } else {
                     reply = data.reply;
                 }
