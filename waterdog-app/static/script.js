@@ -142,15 +142,71 @@ document.addEventListener('DOMContentLoaded', () => {
         return `color:${color};background:${bg};border:${borderWidth} solid ${border};font-weight:${weight};`;
     };
 
-    const handleAiSend = async () => {
-        const question = aiInput.value.trim();
-        if (!question) return;
+    const createAiMessageElement = (question, replyText, pct) => {
+        const div = document.createElement('div');
+        div.className = 'chat-message ai';
 
-        chatHistory.innerHTML += `<div class="chat-message you"><strong>You:</strong> ${question}</div>`;
-        aiInput.value = '';
+        const text = document.createElement('div');
+        text.innerHTML = `<strong>AI:</strong> ${replyText}`;
+        div.appendChild(text);
 
-        const loadingId = 'loading-' + Date.now();
-        chatHistory.innerHTML += `<div id="${loadingId}" class="chat-message ai"><em>Thinking about the best decision...</em></div>`;
+        if (pct !== null) {
+            const badge = document.createElement('div');
+            badge.className = 'ai-confidence';
+            badge.setAttribute('style', confidenceStyle(pct));
+            badge.textContent = `Confidence: ${pct}%`;
+            div.appendChild(badge);
+        }
+
+        const actions = document.createElement('div');
+        actions.className = 'ai-actions';
+
+        const rejectBtn = document.createElement('button');
+        rejectBtn.className = 'ai-action-btn reject-btn';
+        rejectBtn.textContent = 'Reject';
+        rejectBtn.onclick = () => div.remove();
+
+        const retryBtn = document.createElement('button');
+        retryBtn.className = 'ai-action-btn retry-btn';
+        retryBtn.textContent = 'Retry';
+        retryBtn.onclick = () => fetchAiReply(question, false, div);
+
+        actions.append(rejectBtn, retryBtn);
+        div.appendChild(actions);
+        return div;
+    };
+
+    const createUserMessageElement = (question) => {
+        const div = document.createElement('div');
+        div.className = 'chat-message you';
+        const text = document.createElement('div');
+        text.innerHTML = `<strong>You:</strong> ${question}`;
+        div.appendChild(text);
+        const actions = document.createElement('div');
+        actions.className = 'ai-actions';
+        const resendBtn = document.createElement('button');
+        resendBtn.className = 'ai-action-btn resend-btn';
+        resendBtn.textContent = 'Resend';
+        resendBtn.onclick = () => fetchAiReply(question, true, null);
+        actions.appendChild(resendBtn);
+        div.appendChild(actions);
+        return div;
+    };
+
+    const fetchAiReply = async (question, appendUserMessage, replaceElement) => {
+        if (appendUserMessage) {
+            chatHistory.appendChild(createUserMessageElement(question));
+        }
+
+        const loadingDiv = document.createElement('div');
+        loadingDiv.className = 'chat-message ai';
+        loadingDiv.innerHTML = '<em>Thinking about the best decision...</em>';
+
+        if (replaceElement) {
+            replaceElement.replaceWith(loadingDiv);
+        } else {
+            chatHistory.appendChild(loadingDiv);
+        }
         chatHistory.scrollTop = chatHistory.scrollHeight;
 
         try {
@@ -159,33 +215,34 @@ document.addEventListener('DOMContentLoaded', () => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ message: question })
             });
-
             const data = await response.json();
-            const loadingElement = document.getElementById(loadingId);
-            if (loadingElement) loadingElement.remove();
 
             if (data.reply) {
                 const lines = data.reply.trimEnd().split('\n');
                 const lastLine = lines[lines.length - 1].trim();
                 const confidenceMatch = lastLine.match(/^Confidence:\s*(\d+)%$/i);
-                let reply, confidenceHTML = '';
+                let replyText, pct = null;
                 if (confidenceMatch) {
-                    reply = lines.slice(0, -1).join('\n').trimEnd();
-                    const pct = Math.max(0, parseInt(confidenceMatch[1]) - 10);
-                    confidenceHTML = `<div class="ai-confidence" style="${confidenceStyle(pct)}">Confidence: ${pct}%</div>`;
+                    replyText = lines.slice(0, -1).join('\n').trimEnd();
+                    pct = Math.max(0, parseInt(confidenceMatch[1]) - 20);
                 } else {
-                    reply = data.reply;
+                    replyText = data.reply;
                 }
-                chatHistory.innerHTML += `<div class="chat-message ai"><strong>AI:</strong> ${reply}${confidenceHTML}</div>`;
+                loadingDiv.replaceWith(createAiMessageElement(question, replyText, pct));
             } else if (data.error) {
-                chatHistory.innerHTML += `<div class="chat-message ai" style="color:red;">Error: ${data.error}</div>`;
+                loadingDiv.innerHTML = `<span style="color:red;">Error: ${data.error}</span>`;
             }
-        } catch (error) {
-            const loadingElement = document.getElementById(loadingId);
-            if (loadingElement) loadingElement.remove();
-            chatHistory.innerHTML += `<div class="chat-message ai" style="color:red;">Error: Connection failure.</div>`;
+        } catch {
+            loadingDiv.innerHTML = `<span style="color:red;">Error: Connection failure.</span>`;
         }
         chatHistory.scrollTop = chatHistory.scrollHeight;
+    };
+
+    const handleAiSend = () => {
+        const question = aiInput.value.trim();
+        if (!question) return;
+        aiInput.value = '';
+        fetchAiReply(question, true, null);
     };
 
     sendAiBtn.onclick = handleAiSend;

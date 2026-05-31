@@ -183,6 +183,26 @@ button {
 .modal-buttons button { flex: 1; }
 #send-ai-btn { background: #007AFF; color: white; }
 
+.ai-actions {
+    display: flex;
+    gap: 6px;
+    margin-top: 8px;
+}
+
+.ai-action-btn {
+    padding: 3px 10px;
+    font-size: 0.75rem;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    font-weight: normal;
+    box-shadow: none;
+}
+
+.reject-btn  { background: #ff3b30; color: white; }
+.resend-btn  { background: #e5e5ea; color: #333; }
+.retry-btn   { background: #007AFF; color: white; }
+
 .ai-confidence {
     display: inline-block;
     margin-top: 6px;
