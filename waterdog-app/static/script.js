@@ -105,15 +105,62 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- Speech Synthesizer Flow Controllers ---
-    const speakText = (msg) => {
-        if (!msg.trim()) return;
+    const speakBtn = document.getElementById('speak-btn');
+
+    // Global TTS state — only one utterance can play at a time
+    const tts = {
+        activeBtn: null,
+        paused: false,
+        resetBtn(btn) {
+            if (!btn) return;
+            btn.textContent = btn === speakBtn ? '📢 Speak' : '🔊';
+        },
+        setPlaying(btn) {
+            if (this.activeBtn && this.activeBtn !== btn) this.resetBtn(this.activeBtn);
+            this.activeBtn = btn;
+            this.paused = false;
+            if (btn) btn.textContent = btn === speakBtn ? '⏸ Pause' : '⏸';
+        },
+        setPaused() {
+            this.paused = true;
+            if (this.activeBtn) {
+                this.activeBtn.textContent = this.activeBtn === speakBtn ? '▶ Resume' : '▶';
+            }
+        },
+        clear() {
+            this.resetBtn(this.activeBtn);
+            this.activeBtn = null;
+            this.paused = false;
+        }
+    };
+
+    const speakText = (msg, btn = null) => {
+        if (!msg || !msg.trim()) return;
+
+        // Same button pressed again — toggle pause / resume
+        if (btn && tts.activeBtn === btn) {
+            if (!tts.paused) {
+                window.speechSynthesis.pause();
+                tts.setPaused();
+            } else {
+                window.speechSynthesis.resume();
+                tts.setPlaying(btn);
+            }
+            return;
+        }
+
+        // New speech — cancel anything playing
+        window.speechSynthesis.cancel();
         const utterance = new SpeechSynthesisUtterance(msg);
+        utterance.onend = () => tts.clear();
+        utterance.onerror = () => tts.clear();
+        tts.setPlaying(btn);
         window.speechSynthesis.speak(utterance);
     };
 
     const setOutputAndSpeak = (text) => {
         output.value = text;
-        speakText(text);
+        speakText(text, speakBtn);
         output.focus();
     };
 
@@ -125,7 +172,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('where-btn').onclick = () => setOutputAndSpeak("Where is it?");
     document.getElementById('finish-btn').onclick = () => setOutputAndSpeak("I'm finished with my task.");
 
-    document.getElementById('speak-btn').onclick = () => speakText(output.value);
+    speakBtn.onclick = () => speakText(output.value, speakBtn);
     document.getElementById('clear-btn').onclick = () => { output.value = ''; output.focus(); };
 
     // AI Chat button — pre-fills AI input with current output text then focuses it
@@ -212,7 +259,7 @@ document.addEventListener('DOMContentLoaded', () => {
         speakAiBtn.className = 'ai-action-btn speak-ai-btn';
         speakAiBtn.textContent = '🔊';
         speakAiBtn.title = 'Read aloud';
-        speakAiBtn.onclick = () => speakText(replyText);
+        speakAiBtn.onclick = () => speakText(replyText, speakAiBtn);
 
         const rejectBtn = document.createElement('button');
         rejectBtn.className = 'ai-action-btn reject-btn';
