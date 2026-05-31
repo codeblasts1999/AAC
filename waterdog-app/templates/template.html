@@ -5,9 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Express a Thought - AAC Keyboard</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <!-- Apply theme before first paint to prevent flash -->
+    <script>
+        (function() {
+            var saved = localStorage.getItem('theme');
+            var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            if (saved === 'dark' || (!saved && prefersDark)) {
+                document.documentElement.classList.add('dark-mode');
+            }
+        })();
+    </script>
 </head>
 <body>
     <h1 class="sr-only">Express a Thought — AAC Keyboard</h1>
+
+    <div id="page-header">
+        <button id="theme-btn" aria-label="Switch to dark mode">Dark mode</button>
+    </div>
 
     <div id="app">
         <!-- AI Chat Panel (inline, starts left) -->

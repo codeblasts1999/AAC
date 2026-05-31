@@ -452,6 +452,24 @@ document.addEventListener('DOMContentLoaded', () => {
         disclaimerModal.classList.add('hidden');
     };
 
+    // Dark mode toggle
+    const themeBtn = document.getElementById('theme-btn');
+    const html = document.documentElement;
+
+    const applyThemeLabel = () => {
+        const isDark = html.classList.contains('dark-mode');
+        themeBtn.textContent = isDark ? 'Light mode' : 'Dark mode';
+        themeBtn.setAttribute('aria-label', isDark ? 'Switch to light mode' : 'Switch to dark mode');
+    };
+
+    applyThemeLabel(); // sync label with whatever the inline script already applied
+
+    themeBtn.onclick = () => {
+        html.classList.toggle('dark-mode');
+        localStorage.setItem('theme', html.classList.contains('dark-mode') ? 'dark' : 'light');
+        applyThemeLabel();
+    };
+
     // Start with AI panel hidden — user opts in
     aiPanel.classList.add('panel-hidden');
     aiRevealBtns.style.display = 'flex';
