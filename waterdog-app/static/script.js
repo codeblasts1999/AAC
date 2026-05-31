@@ -200,7 +200,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const loadingDiv = document.createElement('div');
         loadingDiv.className = 'chat-message ai';
-        loadingDiv.innerHTML = '<em>Thinking about the best decision...</em>';
+        loadingDiv.innerHTML = '<em>Thinking, then checking with governance AI…</em>';
 
         if (replaceElement) {
             replaceElement.replaceWith(loadingDiv);
@@ -224,7 +224,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 let replyText, pct = null;
                 if (confidenceMatch) {
                     replyText = lines.slice(0, -1).join('\n').trimEnd();
-                    pct = Math.max(0, parseInt(confidenceMatch[1]) - 20);
+                    pct = Math.max(0, parseInt(confidenceMatch[1]) - 10);
                 } else {
                     replyText = data.reply;
                 }
