@@ -10,6 +10,12 @@
     border: 0;
 }
 
+:focus-visible {
+    outline: 3px solid #0062CC;
+    outline-offset: 2px;
+    border-radius: 3px;
+}
+
 body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     padding: 15px;
@@ -83,7 +89,7 @@ body {
 
 #output-field {
     width: 100%;
-    height: 100px;
+    min-height: 100px;
     border: 2px solid #007AFF;
     padding: 12px;
     font-size: 1.6rem;
@@ -91,7 +97,7 @@ body {
     background: white;
     margin-bottom: 15px;
     box-sizing: border-box;
-    resize: none;
+    resize: vertical;
     font-family: inherit;
 }
 
@@ -102,7 +108,7 @@ body {
 }
 
 #show-ai-btn {
-    background: #34c759;
+    background: #2e7d32;
     color: white;
     flex: 1;
 }
@@ -118,7 +124,7 @@ body {
 }
 
 #hide-ai-btn {
-    background: #ff3b30;
+    background: #c0392b;
     color: white;
     padding: 6px 10px;
     font-size: 0.85rem;
@@ -147,11 +153,7 @@ body {
     display: none;
 }
 
-#ai-panel.panel-hidden ~ #main-content #show-ai-btn {
-    display: block;
-}
-
-.speak-ai-btn { background: #8e8e93; color: white; }
+.speak-ai-btn { background: #636366; color: white; }
 
 /* Keyboard Container Layout */
 #keyboard {
@@ -194,17 +196,17 @@ body {
 
 /* Utility Functional Classes overrides */
 .key.shift-key {
-    background: #adb5bd;
+    background: #6c757d;
     color: white;
     flex: 1.5;
 }
 
 .key.shift-key.active {
-    background: #007AFF;
+    background: #0062CC;
 }
 
 .key.backspace-key {
-    background: #ff3b30;
+    background: #c0392b;
     color: white;
     font-weight: bold;
     flex: 1.5;
@@ -233,9 +235,9 @@ button {
     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
-#speak-btn { background: #34c759; color: white; }
-#ai-btn { background: #5856d6; color: white; }
-#clear-btn { background: #8e8e93; color: white; }
+#speak-btn { background: #2e7d32; color: white; }
+#ai-btn    { background: #5856d6; color: white; }
+#clear-btn { background: #636366; color: white; }
 
 #emergency-btn {
     grid-column: span 3;
@@ -245,10 +247,14 @@ button {
 
 /* AI Chat Panel internals */
 #chat-history {
-    height: 300px; overflow-y: auto;
+    min-height: 150px;
+    max-height: 400px;
+    overflow-y: auto;
     border: 1px solid #e5e5ea;
-    margin-bottom: 12px; padding: 10px;
-    font-size: 1rem; border-radius: 8px;
+    margin-bottom: 12px;
+    padding: 10px;
+    font-size: 1rem;
+    border-radius: 8px;
 }
 
 /* Stylings for Chat Message bubbles */
@@ -260,7 +266,7 @@ button {
     word-wrap: break-word;
 }
 .you { background: #e1f5fe; text-align: right; margin-left: 20px; }
-.ai { background: #f2f2f7; text-align: left; margin-right: 20px; }
+.ai  { background: #f2f2f7; text-align: left;  margin-right: 20px; }
 
 .who-are-you-section {
     margin-bottom: 10px;
@@ -268,7 +274,7 @@ button {
 
 #who-are-you {
     width: 100%;
-    height: 56px;
+    min-height: 56px;
     padding: 8px 10px;
     box-sizing: border-box;
     border: 1px solid #ccc;
@@ -288,12 +294,12 @@ button {
 .groq-notice {
     margin-top: 10px;
     font-size: 0.75rem;
-    color: #888;
+    color: #666;
     line-height: 1.4;
 }
 
 .groq-notice a {
-    color: #888;
+    color: #666;
     text-decoration: underline;
 }
 
@@ -305,12 +311,13 @@ button {
 
 .modal-buttons { display: flex; justify-content: space-between; gap: 10px; }
 .modal-buttons button { flex: 1; }
-#send-ai-btn { background: #007AFF; color: white; }
+#send-ai-btn { background: #0062CC; color: white; }
 
 .ai-actions {
     display: flex;
     gap: 6px;
     margin-top: 8px;
+    flex-wrap: wrap;
 }
 
 .ai-action-btn {
@@ -323,12 +330,12 @@ button {
     box-shadow: none;
 }
 
-.reject-btn       { background: #ff3b30; color: white; }
-.resend-btn       { background: #e5e5ea; color: #333; }
-.retry-btn        { background: #007AFF; color: white; }
-.not-intent-btn   { background: #ff9500; color: white; }
-.corroborate-btn  { background: #5856d6; color: white; }
-.elaborate-btn    { background: #34c759; color: white; }
+.reject-btn      { background: #c0392b; color: white; }
+.resend-btn      { background: #e5e5ea; color: #333; }
+.retry-btn       { background: #0062CC; color: white; }
+.not-intent-btn  { background: #ff9500; color: #1a1a1a; }
+.corroborate-btn { background: #5856d6; color: white; }
+.elaborate-btn   { background: #2e7d32; color: white; }
 
 .clarification-panel {
     display: flex;
@@ -386,7 +393,7 @@ button {
 #disclaimer-ok-btn {
     margin-top: 8px;
     width: 100%;
-    background: #007AFF;
+    background: #0062CC;
     color: white;
     font-size: 1rem;
     padding: 14px;
