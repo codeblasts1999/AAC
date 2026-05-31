@@ -65,7 +65,7 @@ def chat():
             reply_body = '\n'.join(lines[:-1]).rstrip()
 
             gov = client.chat.completions.create(
-                model="llama-3.3-70b-versatile",
+                model="openai/gpt-oss-20b",
                 messages=[
                     {
                         "role": "system",
