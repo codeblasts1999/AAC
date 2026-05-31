@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const output = document.getElementById('output-field');
+    const aiInput = document.getElementById('ai-input');
     const keyboard = document.getElementById('keyboard');
-    
+
     // Shift toggle tracking state
     let isShiftActive = false;
 
@@ -19,9 +19,9 @@ document.addEventListener('DOMContentLoaded', () => {
         [['Shift', 'Shift', 'shift-key'], [' ', ' ', 'space-key'], ['⌫', '⌫', 'backspace-key']]
     ];
 
-    // Main Keyboard Render Function
+    // Main Keyboard Render Function — types into the AI chat input
     function renderKeyboard() {
-        keyboard.innerHTML = ''; 
+        keyboard.innerHTML = '';
 
         keyboardLayout.forEach(row => {
             const rowContainer = document.createElement('div');
@@ -31,8 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const [normalChar, shiftedChar, customClass] = keyConfig;
                 const button = document.createElement('button');
                 button.className = 'key';
-                
-                // Set appropriate display text based on active Shift state
+
                 if (customClass) {
                     button.classList.add(customClass);
                     button.textContent = normalChar;
@@ -43,41 +42,41 @@ document.addEventListener('DOMContentLoaded', () => {
                     button.textContent = isShiftActive ? shiftedChar : normalChar;
                 }
 
-                // Prevent losing focus on textarea wrapper element when keys are tapped
+                // Prevent losing focus on ai-input when keys are tapped
                 button.onmousedown = (e) => e.preventDefault();
 
                 button.onclick = () => {
-                    const startPos = output.selectionStart;
-                    const endPos = output.selectionEnd;
-                    const currentText = output.value;
+                    const startPos = aiInput.selectionStart;
+                    const endPos = aiInput.selectionEnd;
+                    const currentText = aiInput.value;
 
                     if (customClass === 'shift-key') {
                         isShiftActive = !isShiftActive;
-                        renderKeyboard(); 
+                        renderKeyboard();
                         return;
-                    } 
-                    
+                    }
+
                     if (customClass === 'backspace-key') {
                         if (startPos === endPos) {
                             if (startPos > 0) {
-                                output.value = currentText.substring(0, startPos - 1) + currentText.substring(endPos);
-                                output.setSelectionRange(startPos - 1, startPos - 1);
+                                aiInput.value = currentText.substring(0, startPos - 1) + currentText.substring(endPos);
+                                aiInput.setSelectionRange(startPos - 1, startPos - 1);
                             }
                         } else {
-                            output.value = currentText.substring(0, startPos) + currentText.substring(endPos);
-                            output.setSelectionRange(startPos, startPos);
+                            aiInput.value = currentText.substring(0, startPos) + currentText.substring(endPos);
+                            aiInput.setSelectionRange(startPos, startPos);
                         }
                     } else {
                         const charToInsert = isShiftActive ? shiftedChar : normalChar;
-                        output.value = currentText.substring(0, startPos) + charToInsert + currentText.substring(endPos);
-                        output.setSelectionRange(startPos + 1, startPos + 1);
+                        aiInput.value = currentText.substring(0, startPos) + charToInsert + currentText.substring(endPos);
+                        aiInput.setSelectionRange(startPos + 1, startPos + 1);
 
                         if (isShiftActive) {
                             isShiftActive = false;
                             renderKeyboard();
                         }
                     }
-                    output.focus();
+                    aiInput.focus();
                 };
 
                 rowContainer.appendChild(button);
@@ -94,44 +93,43 @@ document.addEventListener('DOMContentLoaded', () => {
         window.speechSynthesis.speak(utterance);
     };
 
-    const setOutputAndSpeak = (msg) => {
-        output.value = msg;
-        speakText(msg);
-        output.focus();
+    const insertIntoAiInput = (text) => {
+        const startPos = aiInput.selectionStart;
+        const endPos = aiInput.selectionEnd;
+        const current = aiInput.value;
+        aiInput.value = current.substring(0, startPos) + text + current.substring(endPos);
+        aiInput.setSelectionRange(startPos + text.length, startPos + text.length);
+        aiInput.focus();
+        speakText(text);
     };
 
     // Controller Bindings
-    document.getElementById('emergency-btn').onclick = () => setOutputAndSpeak("Emergency! I need help immediately.");
-    document.getElementById('hello-btn').onclick = () => setOutputAndSpeak("Hello.");
-    document.getElementById('morn-btn').onclick = () => setOutputAndSpeak("Good morning.");
-    document.getElementById('help-btn').onclick = () => setOutputAndSpeak("I need help.");
-    document.getElementById('where-btn').onclick = () => setOutputAndSpeak("Where is it?");
-    document.getElementById('finish-btn').onclick = () => setOutputAndSpeak("I'm finished with my task.");
-    
-    document.getElementById('speak-btn').onclick = () => speakText(output.value);
-    document.getElementById('clear-btn').onclick = () => { output.value = ''; output.focus(); };
+    document.getElementById('emergency-btn').onclick = () => insertIntoAiInput("Emergency! I need help immediately.");
+    document.getElementById('hello-btn').onclick = () => insertIntoAiInput("Hello.");
+    document.getElementById('morn-btn').onclick = () => insertIntoAiInput("Good morning.");
+    document.getElementById('help-btn').onclick = () => insertIntoAiInput("I need help.");
+    document.getElementById('where-btn').onclick = () => insertIntoAiInput("Where is it?");
+    document.getElementById('finish-btn').onclick = () => insertIntoAiInput("I'm finished with my task.");
 
-    // --- Pure Client-Side AI Chat Logic ---
-    const aiBtn = document.getElementById('ai-btn');
-    const aiModal = document.getElementById('ai-modal');
-    const closeAiBtn = document.getElementById('close-ai-btn');
-    const sendAiBtn = document.getElementById('send-ai-btn');
-    const aiInput = document.getElementById('ai-input');
-    const chatHistory = document.getElementById('chat-history');
+    document.getElementById('speak-btn').onclick = () => speakText(aiInput.value);
+    document.getElementById('clear-btn').onclick = () => { aiInput.value = ''; aiInput.focus(); };
 
-    // Replace YOUR_GROQ_API_KEY with your actual Groq key for local testing
-    const GROQ_API_KEY = "YOUR_GROQ_API_KEY"; 
+    document.getElementById('ai-btn').onclick = () => aiInput.focus();
 
-    aiBtn.onclick = () => {
-        const currentAacText = output.value.trim();
-        if (currentAacText) {
-            aiInput.value = currentAacText;
-        }
-        aiModal.classList.remove('hidden');
-        aiInput.focus();
+    // Toggle AI panel between left and right
+    const aiPanel = document.getElementById('ai-panel');
+    const togglePanelBtn = document.getElementById('toggle-panel-btn');
+
+    togglePanelBtn.onclick = () => {
+        aiPanel.classList.toggle('panel-right');
+        const isRight = aiPanel.classList.contains('panel-right');
+        togglePanelBtn.textContent = isRight ? '←' : '→';
+        togglePanelBtn.title = isRight ? 'Move panel to left' : 'Move panel to right';
     };
 
-    closeAiBtn.onclick = () => aiModal.classList.add('hidden');
+    // --- AI Chat Logic ---
+    const sendAiBtn = document.getElementById('send-ai-btn');
+    const chatHistory = document.getElementById('chat-history');
 
     const handleAiSend = async () => {
         const question = aiInput.value.trim();
@@ -145,15 +143,10 @@ document.addEventListener('DOMContentLoaded', () => {
         chatHistory.scrollTop = chatHistory.scrollHeight;
 
         try {
-            // Direct API fetch call replacing the Flask backend route connection
             const response = await fetch('/api/chat', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    message: question
-                })
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: question })
             });
 
             const data = await response.json();

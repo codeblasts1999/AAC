@@ -8,37 +8,37 @@
 </head>
 <body>
     <div id="app">
-        <!-- Textarea configured for large, clear text input -->
-        <textarea id="output-field" placeholder="Type here..."></textarea>
-        
-        <div class="controls">
-            <button id="speak-btn">📢 Speak</button>
-            <button id="ai-btn">🤖 AI Chat</button>
-            <button id="clear-btn">🧹 Clear</button>
-            <button id="hello-btn">👋 Hello</button>
-            <button id="morn-btn">🌅 Good morning</button>
-            <button id="help-btn">🤝 I need help</button>
-            <button id="where-btn">❓ Where is it?</button>
-            <button id="finish-btn">✅ Task finished</button>
-            <button id="emergency-btn" style="background: #d32f2f; color: white;">🚨 EMERGENCY</button>
-        </div>
-
-        <div id="keyboard"></div>
-    </div>
-
-    <!-- AI Chat Modal Interface -->
-    <div id="ai-modal" class="modal hidden">
-        <div class="modal-content">
-            <h3>AI Assistant</h3>
+        <!-- AI Chat Panel (inline, starts left) -->
+        <div id="ai-panel">
+            <div class="panel-header">
+                <h3>AI Assistant</h3>
+                <button id="toggle-panel-btn" title="Move panel to right">→</button>
+            </div>
             <div id="chat-history"></div>
             <input type="text" id="ai-input" placeholder="Ask your question...">
             <div class="modal-buttons">
                 <button id="send-ai-btn">Send</button>
-                <button id="close-ai-btn">Close</button>
             </div>
             <div class="ai-privacy-notice">
                 Your ideas are all yours, we're here to help you share them. If something does not feel right, you're free to keep our chat to yourself.
             </div>
+        </div>
+
+        <!-- Main content: output + controls + keyboard -->
+        <div id="main-content">
+            <div class="controls">
+                <button id="speak-btn">📢 Speak</button>
+                <button id="ai-btn">🤖 AI Chat</button>
+                <button id="clear-btn">🧹 Clear</button>
+                <button id="hello-btn">👋 Hello</button>
+                <button id="morn-btn">🌅 Good morning</button>
+                <button id="help-btn">🤝 I need help</button>
+                <button id="where-btn">❓ Where is it?</button>
+                <button id="finish-btn">✅ Task finished</button>
+                <button id="emergency-btn" style="background: #d32f2f; color: white;">🚨 EMERGENCY</button>
+            </div>
+
+            <div id="keyboard"></div>
         </div>
     </div>
 
