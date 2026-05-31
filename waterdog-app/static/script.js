@@ -107,10 +107,16 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Speech Synthesizer Flow Controllers ---
     const speakBtn = document.getElementById('speak-btn');
 
-    // Global TTS state — only one utterance can play at a time
+    // speechSynthesis.pause() is broken in Chrome — workaround: cancel and
+    // resume by restarting a new utterance from the last tracked word boundary.
+    let ttsGeneration = 0;
+
     const tts = {
         activeBtn: null,
         paused: false,
+        fullMsg: '',
+        charOffset: 0,
+        getCharOffset: () => 0,
         resetBtn(btn) {
             if (!btn) return;
             btn.textContent = btn === speakBtn ? '📢 Speak' : '🔊';
@@ -131,31 +137,50 @@ document.addEventListener('DOMContentLoaded', () => {
             this.resetBtn(this.activeBtn);
             this.activeBtn = null;
             this.paused = false;
+            this.charOffset = 0;
+            this.getCharOffset = () => 0;
         }
+    };
+
+    const startUtterance = (text, btn, startOffset) => {
+        const myGen = ++ttsGeneration;
+        const utterance = new SpeechSynthesisUtterance(text);
+        let lastBoundary = 0;
+
+        utterance.onboundary = (e) => { lastBoundary = e.charIndex; };
+        utterance.onend = () => { if (ttsGeneration === myGen) tts.clear(); };
+        utterance.onerror = () => { if (ttsGeneration === myGen) tts.clear(); };
+
+        tts.getCharOffset = () => startOffset + lastBoundary;
+        window.speechSynthesis.speak(utterance);
     };
 
     const speakText = (msg, btn = null) => {
         if (!msg || !msg.trim()) return;
 
-        // Same button pressed again — toggle pause / resume
         if (btn && tts.activeBtn === btn) {
             if (!tts.paused) {
-                window.speechSynthesis.pause();
+                // Pause: record position, invalidate current utterance, cancel
+                tts.charOffset = tts.getCharOffset();
+                ttsGeneration++;
                 tts.setPaused();
+                window.speechSynthesis.cancel();
             } else {
-                window.speechSynthesis.resume();
+                // Resume: restart from saved position
+                tts.paused = false;
                 tts.setPlaying(btn);
+                startUtterance(tts.fullMsg.substring(tts.charOffset), btn, tts.charOffset);
             }
             return;
         }
 
-        // New speech — cancel anything playing
-        window.speechSynthesis.cancel();
-        const utterance = new SpeechSynthesisUtterance(msg);
-        utterance.onend = () => tts.clear();
-        utterance.onerror = () => tts.clear();
+        // New speech — invalidate previous utterance and start fresh
+        ttsGeneration++;
         tts.setPlaying(btn);
-        window.speechSynthesis.speak(utterance);
+        tts.fullMsg = msg;
+        tts.charOffset = 0;
+        window.speechSynthesis.cancel();
+        startUtterance(msg, btn, 0);
     };
 
     const setOutputAndSpeak = (text) => {
