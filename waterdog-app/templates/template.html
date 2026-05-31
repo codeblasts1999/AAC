@@ -14,6 +14,9 @@
                 <h3>AI Assistant</h3>
                 <button id="toggle-panel-btn" title="Move panel to right">→</button>
             </div>
+            <div class="who-are-you-section">
+                <textarea id="who-are-you" placeholder="Who are you?"></textarea>
+            </div>
             <div id="chat-history"></div>
             <input type="text" id="ai-input" placeholder="Ask your question...">
             <div class="modal-buttons">
@@ -21,6 +24,9 @@
             </div>
             <div class="ai-privacy-notice">
                 Your ideas are all yours, we're here to help you share them. If something does not feel right, you're free to keep our chat to yourself.
+            </div>
+            <div class="groq-notice">
+                Messages are processed by Groq, a third-party AI service. Groq may retain messages per their terms of service. <a href="https://console.groq.com/docs/legal/services-agreement" target="_blank" rel="noopener">Services Agreement.</a>
             </div>
         </div>
 
@@ -48,6 +54,7 @@
             <h3>Before you chat</h3>
             <p>The AI assistant uses <strong>Generative AI</strong> to produce its responses. It can make mistakes.</p>
             <p>Always check important answers with a trusted person or reliable source.</p>
+            <p>Your messages are sent to <strong>Groq</strong>, a third-party AI service, for processing. Groq may retain messages according to their terms of service. <a href="https://console.groq.com/docs/legal/services-agreement" target="_blank" rel="noopener">Read Groq's Services Agreement.</a></p>
             <button id="disclaimer-ok-btn">I understand</button>
         </div>
     </div>

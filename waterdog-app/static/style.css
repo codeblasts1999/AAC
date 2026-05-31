@@ -173,6 +173,41 @@ button {
 .you { background: #e1f5fe; text-align: right; margin-left: 20px; }
 .ai { background: #f2f2f7; text-align: left; margin-right: 20px; }
 
+.who-are-you-section {
+    margin-bottom: 10px;
+}
+
+#who-are-you {
+    width: 100%;
+    height: 56px;
+    padding: 8px 10px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-family: inherit;
+    resize: none;
+    color: #333;
+}
+
+#who-are-you:focus {
+    border-color: #5856d6;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(88, 86, 214, 0.2);
+}
+
+.groq-notice {
+    margin-top: 10px;
+    font-size: 0.75rem;
+    color: #888;
+    line-height: 1.4;
+}
+
+.groq-notice a {
+    color: #888;
+    text-decoration: underline;
+}
+
 #ai-input {
     width: 100%; padding: 12px; margin-bottom: 12px;
     box-sizing: border-box; border: 1px solid #ccc; border-radius: 8px;

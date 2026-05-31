@@ -1,6 +1,18 @@
 document.addEventListener('DOMContentLoaded', () => {
     const aiInput = document.getElementById('ai-input');
+    const whoAreYou = document.getElementById('who-are-you');
     const keyboard = document.getElementById('keyboard');
+
+    // Keyboard types into whichever input is currently active
+    let activeInput = aiInput;
+    aiInput.addEventListener('focus', () => { activeInput = aiInput; });
+    whoAreYou.addEventListener('focus', () => { activeInput = whoAreYou; });
+
+    // Persist "Who are you?" across page loads
+    whoAreYou.value = localStorage.getItem('userContext') || '';
+    whoAreYou.addEventListener('input', () => {
+        localStorage.setItem('userContext', whoAreYou.value);
+    });
 
     // Shift toggle tracking state
     let isShiftActive = false;
@@ -42,13 +54,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     button.textContent = isShiftActive ? shiftedChar : normalChar;
                 }
 
-                // Prevent losing focus on ai-input when keys are tapped
+                // Preserve focus on the active input when keys are tapped
                 button.onmousedown = (e) => e.preventDefault();
 
                 button.onclick = () => {
-                    const startPos = aiInput.selectionStart;
-                    const endPos = aiInput.selectionEnd;
-                    const currentText = aiInput.value;
+                    const startPos = activeInput.selectionStart;
+                    const endPos = activeInput.selectionEnd;
+                    const currentText = activeInput.value;
 
                     if (customClass === 'shift-key') {
                         isShiftActive = !isShiftActive;
@@ -59,24 +71,28 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (customClass === 'backspace-key') {
                         if (startPos === endPos) {
                             if (startPos > 0) {
-                                aiInput.value = currentText.substring(0, startPos - 1) + currentText.substring(endPos);
-                                aiInput.setSelectionRange(startPos - 1, startPos - 1);
+                                activeInput.value = currentText.substring(0, startPos - 1) + currentText.substring(endPos);
+                                activeInput.setSelectionRange(startPos - 1, startPos - 1);
                             }
                         } else {
-                            aiInput.value = currentText.substring(0, startPos) + currentText.substring(endPos);
-                            aiInput.setSelectionRange(startPos, startPos);
+                            activeInput.value = currentText.substring(0, startPos) + currentText.substring(endPos);
+                            activeInput.setSelectionRange(startPos, startPos);
                         }
                     } else {
                         const charToInsert = isShiftActive ? shiftedChar : normalChar;
-                        aiInput.value = currentText.substring(0, startPos) + charToInsert + currentText.substring(endPos);
-                        aiInput.setSelectionRange(startPos + 1, startPos + 1);
+                        activeInput.value = currentText.substring(0, startPos) + charToInsert + currentText.substring(endPos);
+                        activeInput.setSelectionRange(startPos + 1, startPos + 1);
 
                         if (isShiftActive) {
                             isShiftActive = false;
                             renderKeyboard();
                         }
                     }
-                    aiInput.focus();
+                    activeInput.focus();
+                    // Keep localStorage in sync if the user typed into who-are-you via keyboard
+                    if (activeInput === whoAreYou) {
+                        localStorage.setItem('userContext', whoAreYou.value);
+                    }
                 };
 
                 rowContainer.appendChild(button);
@@ -273,7 +289,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await fetch('/api/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: question })
+                body: JSON.stringify({ message: question, user_context: whoAreYou.value.trim() || null })
             });
             const data = await response.json();
 
