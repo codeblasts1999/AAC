@@ -120,17 +120,22 @@ document.addEventListener('DOMContentLoaded', () => {
         resetBtn(btn) {
             if (!btn) return;
             btn.textContent = btn === speakBtn ? '📢 Speak' : '🔊';
+            btn.setAttribute('aria-label', btn === speakBtn ? 'Speak' : 'Read aloud');
         },
         setPlaying(btn) {
             if (this.activeBtn && this.activeBtn !== btn) this.resetBtn(this.activeBtn);
             this.activeBtn = btn;
             this.paused = false;
-            if (btn) btn.textContent = btn === speakBtn ? '⏸ Pause' : '⏸';
+            if (btn) {
+                btn.textContent = btn === speakBtn ? '⏸ Pause' : '⏸';
+                btn.setAttribute('aria-label', 'Pause');
+            }
         },
         setPaused() {
             this.paused = true;
             if (this.activeBtn) {
                 this.activeBtn.textContent = this.activeBtn === speakBtn ? '▶ Resume' : '▶';
+                this.activeBtn.setAttribute('aria-label', 'Resume');
             }
         },
         clear() {
@@ -215,19 +220,30 @@ document.addEventListener('DOMContentLoaded', () => {
         aiPanel.classList.toggle('panel-right');
         const isRight = aiPanel.classList.contains('panel-right');
         togglePanelBtn.textContent = isRight ? '←' : '→';
-        togglePanelBtn.title = isRight ? 'Move panel to left' : 'Move panel to right';
+        togglePanelBtn.setAttribute('aria-label', isRight ? 'Move panel to left' : 'Move panel to right');
     };
 
     // Hide / Show AI panel
+    const aiRevealBtns = document.getElementById('ai-reveal-btns');
     const showAiBtn = document.getElementById('show-ai-btn');
+
+    const disableAI = () => {
+        aiPanel.remove();
+        aiRevealBtns.style.display = 'none';
+    };
+
     document.getElementById('hide-ai-btn').onclick = () => {
         aiPanel.classList.add('panel-hidden');
-        showAiBtn.style.display = 'block';
+        aiRevealBtns.style.display = 'flex';
+        showAiBtn.focus();
     };
     showAiBtn.onclick = () => {
         aiPanel.classList.remove('panel-hidden');
-        showAiBtn.style.display = 'none';
+        aiRevealBtns.style.display = 'none';
+        document.getElementById('hide-ai-btn').focus();
     };
+    document.getElementById('disable-ai-btn').onclick = disableAI;
+    document.getElementById('disable-ai-btn-main').onclick = disableAI;
 
     // --- AI Chat Logic ---
     const sendAiBtn = document.getElementById('send-ai-btn');
@@ -283,7 +299,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const speakAiBtn = document.createElement('button');
         speakAiBtn.className = 'ai-action-btn speak-ai-btn';
         speakAiBtn.textContent = '🔊';
-        speakAiBtn.title = 'Read aloud';
+        speakAiBtn.setAttribute('aria-label', 'Read aloud');
         speakAiBtn.onclick = () => speakText(replyText, speakAiBtn);
 
         const rejectBtn = document.createElement('button');
@@ -435,6 +451,10 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('disclaimer-ok-btn').onclick = () => {
         disclaimerModal.classList.add('hidden');
     };
+
+    // Start with AI panel hidden — user opts in
+    aiPanel.classList.add('panel-hidden');
+    aiRevealBtns.style.display = 'flex';
 
     // Initialize Keyboard on mount
     renderKeyboard();

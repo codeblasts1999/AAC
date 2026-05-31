@@ -7,20 +7,24 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
+    <h1 class="sr-only">Express a Thought — AAC Keyboard</h1>
+
     <div id="app">
         <!-- AI Chat Panel (inline, starts left) -->
-        <div id="ai-panel">
+        <div id="ai-panel" aria-label="AI Assistant panel">
             <div class="panel-header">
-                <h3>AI Assistant</h3>
+                <h2>AI Assistant</h2>
                 <div class="panel-header-actions">
-                    <button id="toggle-panel-btn" title="Move panel to right">→</button>
-                    <button id="hide-ai-btn">Hide</button>
+                    <button id="toggle-panel-btn" aria-label="Move panel to right">→</button>
+                    <button id="hide-ai-btn" aria-label="Hide AI panel">Hide</button>
                 </div>
             </div>
             <div class="who-are-you-section">
+                <label for="who-are-you" class="sr-only">Who are you? Describe yourself so the AI can personalise its responses.</label>
                 <textarea id="who-are-you" placeholder="Who are you?"></textarea>
             </div>
-            <div id="chat-history"></div>
+            <div id="chat-history" role="log" aria-live="polite" aria-label="Chat history"></div>
+            <label for="ai-input" class="sr-only">Ask the AI a question</label>
             <input type="text" id="ai-input" placeholder="Ask your question...">
             <div class="modal-buttons">
                 <button id="send-ai-btn">Send</button>
@@ -31,13 +35,20 @@
             <div class="groq-notice">
                 Messages are processed by Groq, a third-party AI service. Groq may retain messages per their terms of service. <a href="https://console.groq.com/docs/legal/services-agreement" target="_blank" rel="noopener">Services Agreement.</a>
             </div>
+            <div class="disable-ai-section">
+                <button id="disable-ai-btn" aria-label="Disable AI for this session">Disable AI</button>
+            </div>
         </div>
 
         <!-- Main content: output field + controls + keyboard -->
         <div id="main-content">
-            <button id="show-ai-btn">Show AI</button>
+            <div id="ai-reveal-btns">
+                <button id="show-ai-btn" aria-label="Show AI panel">Show AI</button>
+                <button id="disable-ai-btn-main" aria-label="Disable AI for this session">Disable AI</button>
+            </div>
+            <label for="output-field" class="sr-only">Type here to speak aloud</label>
             <textarea id="output-field"></textarea>
-            <div class="controls">
+            <div class="controls" role="group" aria-label="Quick phrase buttons">
                 <button id="speak-btn">📢 Speak</button>
                 <button id="ai-btn">🤖 AI Chat</button>
                 <button id="clear-btn">🧹 Clear</button>
@@ -48,14 +59,14 @@
                 <button id="finish-btn">✅ Task finished</button>
                 <button id="emergency-btn" style="background: #d32f2f; color: white;">🚨 EMERGENCY</button>
             </div>
-            <div id="keyboard"></div>
+            <div id="keyboard" role="group" aria-label="On-screen keyboard"></div>
         </div>
     </div>
 
     <!-- AI Disclaimer Modal -->
-    <div id="disclaimer-modal" class="disclaimer-overlay">
+    <div id="disclaimer-modal" class="disclaimer-overlay" role="dialog" aria-modal="true" aria-labelledby="disclaimer-title">
         <div class="disclaimer-box">
-            <h3>Before you chat</h3>
+            <h2 id="disclaimer-title">Before you chat</h2>
             <p>The AI assistant uses <strong>Generative AI</strong> to produce its responses. It can make mistakes.</p>
             <p>Always check important answers with a trusted person or reliable source.</p>
             <p>Your messages are sent to <strong>Groq</strong>, a third-party AI service, for processing. Groq may retain messages according to their terms of service. <a href="https://console.groq.com/docs/legal/services-agreement" target="_blank" rel="noopener">Read Groq's Services Agreement.</a></p>
