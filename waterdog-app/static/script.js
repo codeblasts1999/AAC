@@ -260,7 +260,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const loadingDiv = document.createElement('div');
         loadingDiv.className = 'chat-message ai';
-        loadingDiv.innerHTML = '<em>Thinking, then checking with governance AI…</em>';
+        loadingDiv.innerHTML = '<em>Thinking, then running a safety check…</em>';
 
         if (replaceElement) {
             replaceElement.replaceWith(loadingDiv);
