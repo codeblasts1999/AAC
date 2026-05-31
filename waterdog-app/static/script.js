@@ -131,6 +131,23 @@ document.addEventListener('DOMContentLoaded', () => {
     const sendAiBtn = document.getElementById('send-ai-btn');
     const chatHistory = document.getElementById('chat-history');
 
+    // Tracks whether the next send is a clarification of a prior message
+    let clarificationContext = null; // { originalQuestion, type: 'corroborate' | 'elaborate' }
+
+    const setClarificationMode = (originalQuestion, type, previousAiText = null) => {
+        clarificationContext = { originalQuestion, type, previousAiText };
+        aiInput.placeholder = type === 'corroborate' ? 'Type what you actually meant…' : 'Add more context…';
+        aiInput.classList.add('clarifying');
+        aiInput.value = '';
+        aiInput.focus();
+    };
+
+    const clearClarificationMode = () => {
+        clarificationContext = null;
+        aiInput.placeholder = 'Ask your question...';
+        aiInput.classList.remove('clarifying');
+    };
+
     const confidenceStyle = (pct) => {
         const hue = Math.round((pct / 100) * 120);
         const sat = Math.round(70 + (1 - pct / 100) * 30);
@@ -179,16 +196,59 @@ document.addEventListener('DOMContentLoaded', () => {
     const createUserMessageElement = (question) => {
         const div = document.createElement('div');
         div.className = 'chat-message you';
+
         const text = document.createElement('div');
         text.innerHTML = `<strong>You:</strong> ${question}`;
         div.appendChild(text);
+
         const actions = document.createElement('div');
         actions.className = 'ai-actions';
+
         const resendBtn = document.createElement('button');
         resendBtn.className = 'ai-action-btn resend-btn';
         resendBtn.textContent = 'Resend';
         resendBtn.onclick = () => fetchAiReply(question, true, null);
-        actions.appendChild(resendBtn);
+
+        const notIntentBtn = document.createElement('button');
+        notIntentBtn.className = 'ai-action-btn not-intent-btn';
+        notIntentBtn.textContent = 'Not my intent';
+        notIntentBtn.onclick = () => {
+            const existing = div.querySelector('.clarification-panel');
+            if (existing) { existing.remove(); return; }
+
+            // Find the actual AI response that followed this message so we can
+            // include it in the frame — without it the AI has no real context.
+            let previousAiText = null;
+            let sibling = div.nextElementSibling;
+            while (sibling) {
+                if (sibling.classList.contains('ai')) {
+                    const textNode = sibling.querySelector('div:first-child');
+                    if (textNode) {
+                        previousAiText = textNode.innerText.replace(/^AI:\s*/, '').trim();
+                    }
+                    break;
+                }
+                sibling = sibling.nextElementSibling;
+            }
+
+            const panel = document.createElement('div');
+            panel.className = 'clarification-panel';
+
+            const corroborateBtn = document.createElement('button');
+            corroborateBtn.className = 'ai-action-btn corroborate-btn';
+            corroborateBtn.textContent = 'Corroborate';
+            corroborateBtn.onclick = () => { panel.remove(); setClarificationMode(question, 'corroborate', previousAiText); };
+
+            const elaborateBtn = document.createElement('button');
+            elaborateBtn.className = 'ai-action-btn elaborate-btn';
+            elaborateBtn.textContent = 'Elaborate';
+            elaborateBtn.onclick = () => { panel.remove(); setClarificationMode(question, 'elaborate', previousAiText); };
+
+            panel.append(corroborateBtn, elaborateBtn);
+            div.appendChild(panel);
+        };
+
+        actions.append(resendBtn, notIntentBtn);
         div.appendChild(actions);
         return div;
     };
@@ -239,10 +299,24 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const handleAiSend = () => {
-        const question = aiInput.value.trim();
-        if (!question) return;
+        const text = aiInput.value.trim();
+        if (!text) return;
         aiInput.value = '';
-        fetchAiReply(question, true, null);
+
+        if (clarificationContext) {
+            const { originalQuestion, type, previousAiText } = clarificationContext;
+            clearClarificationMode();
+            const aiContext = previousAiText
+                ? `The AI responded: "${previousAiText}". `
+                : '';
+            const framed = type === 'corroborate'
+                ? `My previous message was: "${originalQuestion}". ${aiContext}What I actually meant was: ${text}`
+                : `My previous message was: "${originalQuestion}". ${aiContext}To add more context: ${text}`;
+            fetchAiReply(framed, true, null);
+        } else {
+            clearClarificationMode();
+            fetchAiReply(text, true, null);
+        }
     };
 
     sendAiBtn.onclick = handleAiSend;

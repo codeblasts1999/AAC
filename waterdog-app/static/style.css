@@ -199,9 +199,23 @@ button {
     box-shadow: none;
 }
 
-.reject-btn  { background: #ff3b30; color: white; }
-.resend-btn  { background: #e5e5ea; color: #333; }
-.retry-btn   { background: #007AFF; color: white; }
+.reject-btn       { background: #ff3b30; color: white; }
+.resend-btn       { background: #e5e5ea; color: #333; }
+.retry-btn        { background: #007AFF; color: white; }
+.not-intent-btn   { background: #ff9500; color: white; }
+.corroborate-btn  { background: #5856d6; color: white; }
+.elaborate-btn    { background: #34c759; color: white; }
+
+.clarification-panel {
+    display: flex;
+    gap: 6px;
+    margin-top: 6px;
+}
+
+#ai-input.clarifying {
+    border-color: #ff9500;
+    box-shadow: 0 0 0 2px rgba(255, 149, 0, 0.25);
+}
 
 .ai-confidence {
     display: inline-block;
